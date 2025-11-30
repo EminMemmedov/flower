@@ -82,37 +82,82 @@ window.addEventListener('load', () => {
     const attemptsDisplay = document.getElementById('attempts-count');
 
     let currentLevel = 0;
-    let direction = 1; // 1 for up, -1 for down
+    let direction = 1;
     let isPlaying = false;
     let animationId;
-    let attempts = 3;
     let gameOver = false;
 
-    // RESET RECORD (User Request)
-    localStorage.setItem('loveBarRecord', 0);
+    // PERSISTENT ATTEMPTS
+    // Load attempts from localStorage, default to 3 if not set
+    let attempts = parseInt(localStorage.getItem('loveBarAttempts'));
+    if (isNaN(attempts)) {
+        attempts = 3;
+        localStorage.setItem('loveBarAttempts', attempts);
+    }
+    attemptsDisplay.innerText = attempts;
 
-    let record = localStorage.getItem('loveBarRecord') || 0;
+    // MOCK GLOBAL RECORD SYSTEM
+    // 1. Load local record
+    // 2. Fetch "global" record from JSON
+    // 3. Show the higher of the two
+    let localRecord = parseInt(localStorage.getItem('loveBarRecord')) || 0;
+    let globalRecord = 0;
+    let displayRecord = localRecord;
 
-    // Initialize marker position
-    recordMarker.style.bottom = record + '%';
+    // Fetch mock global record
+    fetch('record.json')
+        .then(response => response.json())
+        .then(data => {
+            globalRecord = data.record || 0;
+            // If global record is higher than local, show it (simulate "someone else's" record)
+            if (globalRecord > localRecord) {
+                displayRecord = globalRecord;
+            }
+            updateRecordDisplay();
+        })
+        .catch(err => console.log('Record fetch error:', err));
 
-    function gameLoop() {
+    function updateRecordDisplay() {
+        recordMarker.style.bottom = displayRecord + '%';
+    }
+
+    // Initial display
+    updateRecordDisplay();
+
+    // Check if game over on load
+    if (attempts <= 0) {
+        gameOver = true;
+        messageDisplay.innerText = `Oyun Bitti! En İyi: ${displayRecord}%`;
+        loveBarFill.style.backgroundColor = '#555';
+    }
+
+    // PERFORMANCE OPTIMIZED LOOP
+    // Using transform: scaleY for GPU acceleration
+    // Minimized DOM writes
+    let lastTime = 0;
+
+    function gameLoop(timestamp) {
         if (!isPlaying) return;
 
-        // IMPOSSIBLE DIFFICULTY MODE (EXTREME)
-        // Below 70%: Normal ramp up
-        // Above 70%: TELEPORT SPEED. Impossible to time.
+        // Delta time calculation for consistent speed across frame rates
+        if (!lastTime) lastTime = timestamp;
+        const deltaTime = timestamp - lastTime;
+        lastTime = timestamp;
 
+        // Base speed adjustment (normalized for 60fps approx 16ms)
+        const timeScale = deltaTime / 16.67;
+
+        // IMPOSSIBLE DIFFICULTY MODE (EXTREME)
         let finalSpeed;
 
         if (currentLevel > 70) {
-            // "Impossible" -> Moves 15% per frame! It's a blur.
-            finalSpeed = 15.0 + Math.random() * 5.0;
+            // "Impossible" -> Moves very fast
+            finalSpeed = (15.0 + Math.random() * 5.0) * timeScale;
         } else {
-            // Progressive difficulty up to 70%
+            // Progressive difficulty
             let baseSpeed = 0.5;
             let ramp = (currentLevel / 70) * 2.0;
-            finalSpeed = baseSpeed + ramp;
+            finalSpeed = (baseSpeed + ramp) * timeScale;
         }
 
         currentLevel += finalSpeed * direction;
@@ -125,12 +170,14 @@ window.addEventListener('load', () => {
             direction = 1;
         }
 
-        loveBarFill.style.height = currentLevel + '%';
+        // GPU ACCELERATED RENDER
+        // ScaleY takes 0 to 1 value
+        loveBarFill.style.transform = `scaleY(${currentLevel / 100})`;
+
         animationId = requestAnimationFrame(gameLoop);
     }
 
     function stopGame(e) {
-        // Prevent default touch behavior (scrolling/zooming/emulated click)
         if (e && e.type === 'touchstart') {
             e.preventDefault();
         }
@@ -139,24 +186,30 @@ window.addEventListener('load', () => {
 
         if (!isPlaying) {
             if (attempts > 0) {
-                // Start game
                 isPlaying = true;
+                lastTime = 0; // Reset time
                 messageDisplay.innerText = "Durdurmak için bas!";
-                gameLoop();
+                animationId = requestAnimationFrame(gameLoop);
             }
         } else {
-            // Stop game
             isPlaying = false;
             cancelAnimationFrame(animationId);
+
+            // Decrement and Save Attempts
             attempts--;
+            localStorage.setItem('loveBarAttempts', attempts);
             attemptsDisplay.innerText = attempts;
 
             const score = Math.floor(currentLevel);
 
-            if (score > record) {
-                record = score;
-                localStorage.setItem('loveBarRecord', record);
-                recordMarker.style.bottom = record + '%';
+            // Check against Display Record (Global or Local)
+            if (score > displayRecord) {
+                // New Record!
+                localRecord = score;
+                displayRecord = score;
+                localStorage.setItem('loveBarRecord', localRecord);
+                updateRecordDisplay();
+
                 messageDisplay.innerText = `Tebrikler! Yeni Rekor: ${score}% 🎉`;
                 createConfetti();
             } else {
@@ -165,8 +218,8 @@ window.addEventListener('load', () => {
 
             if (attempts === 0) {
                 gameOver = true;
-                messageDisplay.innerText = `Oyun Bitti! En İyi: ${record}%`;
-                loveBarFill.style.backgroundColor = '#555'; // Grey out bar
+                messageDisplay.innerText = `Oyun Bitti! En İyi: ${displayRecord}%`;
+                loveBarFill.style.backgroundColor = '#555';
             }
         }
     }
