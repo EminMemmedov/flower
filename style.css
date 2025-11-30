@@ -592,17 +592,17 @@ body {
         /* Reset right positioning */
         left: 50%;
         /* Center horizontally */
-        top: 40%;
-        /* Move up slightly */
+        top: 35%;
+        /* Move up to reveal flower */
         transform: translate(-50%, -50%);
         /* Center perfectly */
         background: rgba(0, 0, 0, 0.6);
         /* Dark background for contrast */
-        padding: 3vmin;
-        border-radius: 3vmin;
+        padding: 2vmin;
+        border-radius: 2vmin;
         backdrop-filter: blur(5px);
         /* Blur background for readability */
-        width: 80vw;
+        width: 70vw;
         /* Wide container */
         display: flex;
         flex-direction: column;
@@ -611,46 +611,58 @@ body {
     }
 
     .game-title {
-        font-size: 8vmin;
-        /* Huge title */
-        margin-bottom: 2vmin;
+        font-size: 6vmin;
+        /* Smaller title */
+        margin-bottom: 1vmin;
     }
 
     .bar-holder {
-        width: 15vmin;
-        /* Much wider bar */
-        height: 50vmin;
-        /* Taller bar */
-        margin: 2vmin 0;
+        width: 12vmin;
+        /* Slightly smaller bar */
+        height: 40vmin;
+        /* Shorter bar */
+        margin: 1vmin 0;
     }
 
     .record-label {
         right: 120%;
-        font-size: 4vmin;
+        font-size: 3.5vmin;
         background: rgba(0, 0, 0, 0.5);
         padding: 0.5vmin 1vmin;
         border-radius: 1vmin;
     }
 
     .message-display {
-        font-size: 5vmin;
+        font-size: 4vmin;
         max-width: 100%;
-        margin-top: 2vmin;
+        margin-top: 1vmin;
     }
 
     .attempts-display {
-        font-size: 5vmin;
-        margin-bottom: 2vmin;
+        font-size: 4vmin;
+        margin-bottom: 1vmin;
     }
 
-    /* Hide distracting elements on mobile if needed, or just push them back */
+    /* DISABLE ANIMATIONS ON MOBILE FOR PERFORMANCE */
     .moon {
         width: 12vmin;
         height: 12vmin;
         top: 2vmin;
         right: 2vmin;
         opacity: 0.8;
-        /* Fade it out a bit */
+        animation: none !important;
+        /* Stop pulsing */
+    }
+
+    .flower__leaf,
+    .flower__light,
+    .flower__line {
+        animation: none !important;
+        /* Stop swaying */
+    }
+
+    .flower__g-long {
+        animation: none !important;
     }
 }
 

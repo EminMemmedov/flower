@@ -90,12 +90,9 @@ window.addEventListener('load', () => {
     let gameOver = false;
 
     // PERSISTENT ATTEMPTS
-    // Load attempts from localStorage, default to 3 if not set
-    let attempts = parseInt(localStorage.getItem('loveBarAttempts'));
-    if (isNaN(attempts)) {
-        attempts = 3;
-        localStorage.setItem('loveBarAttempts', attempts);
-    }
+    // RESET ATTEMPTS (User Request)
+    localStorage.setItem('loveBarAttempts', 3);
+    let attempts = 3;
     attemptsDisplay.innerText = attempts;
 
     // MOCK GLOBAL RECORD SYSTEM
