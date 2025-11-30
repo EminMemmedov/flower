@@ -111,7 +111,7 @@ window.addEventListener('load', () => {
     // Fetch real global record
     function fetchGlobalRecord() {
         console.log('Fetching global record...'); // Debug
-        fetch(API_URL)
+        fetch(API_URL, { cache: "no-store" }) // FORCE FRESH DATA
             .then(response => response.json())
             .then(data => {
                 globalRecord = data.record || 0;
