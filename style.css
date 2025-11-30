@@ -446,6 +446,169 @@ body {
     animation-delay: 1.7s;
 }
 
+/* Love Bar Game */
+.game-container {
+    position: fixed;
+    right: 5vmin;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 50;
+    font-family: 'Arial', sans-serif;
+    color: white;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+.game-title {
+    font-size: 2.5vmin;
+    margin: 0 0 1vmin 0;
+    font-weight: bold;
+    color: #ff69b4;
+    text-shadow: 0 0 5px rgba(255, 105, 180, 0.5);
+}
+
+.attempts-display {
+    font-size: 1.5vmin;
+    color: #fff;
+    margin-bottom: 1vmin;
+    font-weight: bold;
+}
+
+.bar-holder {
+    position: relative;
+    width: 4vmin;
+    height: 40vmin;
+    margin: 0 0 1vmin 0;
+}
+
+.love-bar-wrapper {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 0.3vmin solid rgba(255, 255, 255, 0.5);
+    border-radius: 2vmin;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 2vmin rgba(255, 105, 180, 0.3);
+    box-sizing: border-box;
+    /* Ensure border doesn't add size */
+}
+
+.love-bar-fill {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    background: linear-gradient(to top, #ff69b4, #ff1493);
+    box-shadow: 0 0 2vmin #ff1493;
+    transition: height 0.05s linear;
+    /* Smooth movement */
+}
+
+.record-marker {
+    position: absolute;
+    bottom: 0;
+    /* Will be set by JS */
+    left: 0;
+    width: 100%;
+    height: 0;
+    border-top: 0.4vmin dashed #fff;
+    z-index: 10;
+    /* Higher than wrapper content */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+}
+
+.record-label {
+    position: absolute;
+    right: 120%;
+    /* Position to the left of the bar */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.5vmin;
+    color: #fff;
+    white-space: nowrap;
+    text-shadow: 0 0 2px #000;
+    opacity: 1;
+    font-weight: bold;
+}
+
+.message-display {
+    font-size: 1.8vmin;
+    text-align: center;
+    max-width: 15vmin;
+    min-height: 3vmin;
+    color: #fff;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+
+    /* Adjust flowers for mobile portrait */
+    .flowers {
+        transform: scale(0.6);
+        bottom: 5vmin;
+    }
+
+    .flower {
+        bottom: 15vmin;
+    }
+
+    .flower--1 {
+        left: 10%;
+    }
+
+    .flower--2 {
+        left: 50%;
+    }
+
+    .flower--3 {
+        left: 90%;
+    }
+
+    .flower--4 {
+        left: 30%;
+        top: auto;
+        bottom: 20vmin;
+    }
+
+    .flower--5 {
+        left: 70%;
+        top: auto;
+        bottom: 20vmin;
+    }
+
+    /* Adjust Game UI for mobile */
+    .game-container {
+        right: 2vmin;
+    }
+
+    .game-title {
+        font-size: 4vmin;
+    }
+
+    .love-bar-wrapper {
+        width: 6vmin;
+        height: 50vmin;
+    }
+
+    .message-display {
+        font-size: 3.5vmin;
+        max-width: 20vmin;
+    }
+
+    /* Adjust Moon */
+    .moon {
+        width: 15vmin;
+        height: 15vmin;
+        top: 3vmin;
+        right: 3vmin;
+    }
+}
+
 .flower__leafs::after {
     content: "";
     position: absolute;

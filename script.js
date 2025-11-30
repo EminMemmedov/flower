@@ -74,23 +74,140 @@ window.addEventListener('load', () => {
     // Create a heart star every few seconds
     setInterval(createHeartStar, 2000);
 
-    // Mouse Trail
-    document.addEventListener('mousemove', (e) => {
-        const particle = document.createElement('div');
-        particle.classList.add('particle');
+    // Love Bar Game Logic
+    const loveBarFill = document.getElementById('love-bar-fill');
+    const recordMarker = document.getElementById('record-marker');
+    const messageDisplay = document.getElementById('message-display');
+    const attemptsDisplay = document.getElementById('attempts-count');
 
-        particle.style.left = e.clientX + 'px';
-        particle.style.top = e.clientY + 'px';
+    let currentLevel = 0;
+    let direction = 1; // 1 for up, -1 for down
+    let isPlaying = false;
+    let animationId;
+    let attempts = 3;
+    let gameOver = false;
 
-        // Random color for sparkles
-        const hue = Math.random() * 360;
-        particle.style.background = `radial-gradient(circle, hsl(${hue}, 100%, 80%), transparent)`;
+    // RESET RECORD (User Request)
+    localStorage.setItem('loveBarRecord', 0);
 
-        document.body.appendChild(particle);
+    let record = localStorage.getItem('loveBarRecord') || 0;
 
-        setTimeout(() => {
-            particle.remove();
-        }, 1000);
+    // Initialize marker position
+    recordMarker.style.bottom = record + '%';
+
+    function gameLoop() {
+        if (!isPlaying) return;
+
+        // IMPOSSIBLE DIFFICULTY MODE
+        // Below 80%: Normal ramp up
+        // Above 80%: TELEPORT SPEED. Impossible to time.
+
+        let finalSpeed;
+
+        if (currentLevel > 80) {
+            // "Impossible" -> Moves 10% per frame! It's a blur.
+            finalSpeed = 10.0 + Math.random() * 5.0;
+        } else {
+            // Progressive difficulty up to 80%
+            let baseSpeed = 0.5;
+            let ramp = (currentLevel / 80) * 2.0;
+            finalSpeed = baseSpeed + ramp;
+        }
+
+        currentLevel += finalSpeed * direction;
+
+        if (currentLevel >= 100) {
+            currentLevel = 100;
+            direction = -1;
+        } else if (currentLevel <= 0) {
+            currentLevel = 0;
+            direction = 1;
+        }
+
+        loveBarFill.style.height = currentLevel + '%';
+        animationId = requestAnimationFrame(gameLoop);
+    }
+
+    function stopGame() {
+        if (gameOver) return;
+
+        if (!isPlaying) {
+            if (attempts > 0) {
+                // Start game
+                isPlaying = true;
+                messageDisplay.innerText = "Durdurmak için bas!";
+                gameLoop();
+            }
+        } else {
+            // Stop game
+            isPlaying = false;
+            cancelAnimationFrame(animationId);
+            attempts--;
+            attemptsDisplay.innerText = attempts;
+
+            const score = Math.floor(currentLevel);
+
+            if (score > record) {
+                record = score;
+                localStorage.setItem('loveBarRecord', record);
+                recordMarker.style.bottom = record + '%';
+                messageDisplay.innerText = `Tebrikler! Yeni Rekor: ${score}% 🎉`;
+                createConfetti();
+            } else {
+                messageDisplay.innerText = `Skor: ${score}%.`;
+            }
+
+            if (attempts === 0) {
+                gameOver = true;
+                messageDisplay.innerText = `Oyun Bitti! En İyi: ${record}%`;
+                loveBarFill.style.backgroundColor = '#555'; // Grey out bar
+            }
+        }
+    }
+
+    function createConfetti() {
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.left = '50%';
+            confetti.style.top = '50%';
+            confetti.style.width = '1vmin';
+            confetti.style.height = '1vmin';
+            confetti.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            confetti.style.zIndex = '100';
+            confetti.style.pointerEvents = 'none';
+
+            // Random explosion direction
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = Math.random() * 20 + 10;
+            const tx = Math.cos(angle) * velocity;
+            const ty = Math.sin(angle) * velocity;
+
+            confetti.animate([
+                { transform: 'translate(0,0) scale(1)', opacity: 1 },
+                { transform: `translate(${tx}vmin, ${ty}vmin) scale(0)`, opacity: 0 }
+            ], {
+                duration: 1000 + Math.random() * 1000,
+                easing: 'cubic-bezier(0, .9, .57, 1)',
+                fill: 'forwards'
+            });
+
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 2000);
+        }
+    }
+
+    // Controls
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            stopGame();
+        }
+    });
+
+    document.addEventListener('touchstart', stopGame);
+    document.addEventListener('click', (e) => {
+        // Prevent click from triggering immediately after touchstart on mobile
+        stopGame();
     });
 });
 
