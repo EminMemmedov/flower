@@ -585,6 +585,8 @@ body {
     .game-container {
         right: 5vmin;
         /* Give it more space from edge */
+        top: 45%;
+        /* Move it slightly higher (default is 50%) */
     }
 
     .game-title {

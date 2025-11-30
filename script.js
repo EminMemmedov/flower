@@ -7,7 +7,8 @@ window.addEventListener('load', () => {
 
     // Generate Fireflies
     const firefliesContainer = document.querySelector('.fireflies');
-    const fireflyCount = 30;
+    const isMobile = window.innerWidth < 768;
+    const fireflyCount = isMobile ? 10 : 30; // Reduce fireflies on mobile
 
     for (let i = 0; i < fireflyCount; i++) {
         const firefly = document.createElement('div');
@@ -128,7 +129,12 @@ window.addEventListener('load', () => {
         animationId = requestAnimationFrame(gameLoop);
     }
 
-    function stopGame() {
+    function stopGame(e) {
+        // Prevent default touch behavior (scrolling/zooming/emulated click)
+        if (e && e.type === 'touchstart') {
+            e.preventDefault();
+        }
+
         if (gameOver) return;
 
         if (!isPlaying) {
@@ -166,7 +172,8 @@ window.addEventListener('load', () => {
     }
 
     function createConfetti() {
-        for (let i = 0; i < 50; i++) {
+        const confettiCount = isMobile ? 20 : 50; // Reduce confetti on mobile
+        for (let i = 0; i < confettiCount; i++) {
             const confetti = document.createElement('div');
             confetti.style.position = 'fixed';
             confetti.style.left = '50%';
@@ -204,9 +211,14 @@ window.addEventListener('load', () => {
         }
     });
 
-    document.addEventListener('touchstart', stopGame);
+    // Handle touchstart with passive: false to allow preventDefault
+    document.addEventListener('touchstart', stopGame, { passive: false });
+
     document.addEventListener('click', (e) => {
-        // Prevent click from triggering immediately after touchstart on mobile
+        // We can keep click for desktop, but on mobile touchstart will handle it.
+        // If it's a mouse click, e.detail is usually 1.
+        // We can just rely on the fact that we preventDefault on touchstart, 
+        // so the click event shouldn't fire on touch devices.
         stopGame();
     });
 });
