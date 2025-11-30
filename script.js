@@ -97,7 +97,8 @@ window.addEventListener('load', () => {
 
     // REAL GLOBAL RECORD SYSTEM (JSONBlob)
     // This allows syncing across devices without a complex backend.
-    const BLOB_ID = '1345466488219500544';
+    // Updated ID: 019ad62c-fab5-7a9a-8d90-c702da37beb1
+    const BLOB_ID = '019ad62c-fab5-7a9a-8d90-c702da37beb1';
     const API_URL = `https://jsonblob.com/api/jsonBlob/${BLOB_ID}`;
 
     // 1. Load local record
@@ -109,10 +110,12 @@ window.addEventListener('load', () => {
 
     // Fetch real global record
     function fetchGlobalRecord() {
+        console.log('Fetching global record...'); // Debug
         fetch(API_URL)
             .then(response => response.json())
             .then(data => {
                 globalRecord = data.record || 0;
+                console.log('Global record fetched:', globalRecord); // Debug
                 if (globalRecord > localRecord) {
                     displayRecord = globalRecord;
                 } else {
@@ -125,6 +128,7 @@ window.addEventListener('load', () => {
 
     // Update global record
     function updateGlobalRecord(newScore) {
+        console.log('Updating global record to:', newScore); // Debug
         fetch(API_URL, {
             method: 'PUT',
             headers: {
@@ -136,8 +140,8 @@ window.addEventListener('load', () => {
     }
 
     fetchGlobalRecord();
-    // Refresh record every 10 seconds to keep it updated
-    setInterval(fetchGlobalRecord, 10000);
+    // Refresh record every 5 seconds (Faster sync)
+    setInterval(fetchGlobalRecord, 5000);
 
     function updateRecordDisplay() {
         recordMarker.style.bottom = displayRecord + '%';

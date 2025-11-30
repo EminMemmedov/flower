@@ -607,7 +607,7 @@ body {
         display: flex;
         flex-direction: column;
         align-items: center;
-        box-shadow: 0 0 5vmin rgba(255, 105, 180, 0.3);
+        /* box-shadow removed for mobile performance */
     }
 
     .game-title {
