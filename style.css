@@ -654,6 +654,13 @@ body {
         /* Stop pulsing */
     }
 
+    /* Disable grass animations on mobile */
+    .long-g,
+    .long-g .leaf,
+    .flower__g-fr__leaf {
+        animation: none !important;
+    }
+
     /* Flower animations restored by removing the disable rules */
 }
 
